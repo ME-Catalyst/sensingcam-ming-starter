@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "${MOSQUITTO_PORT:-1883}:1883"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_config:/mosquitto/config
+      - mosquitto_log:/mosquitto/log
+    environment:
+      - TZ=${TZ:-UTC}
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "${INFLUXDB_HTTP_PORT:-8086}:8086"
+    env_file:
+      - .env
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+  nodered:
+    image: nodered/node-red:3.1
+    container_name: nodered
+    restart: unless-stopped
+    ports:
+      - "${NODERED_PORT:-1880}:1880"
+    environment:
+      - FLOWS=flows.json
+      - TZ=${TZ:-UTC}
+    volumes:
+      - nodered_data:/data
+      - type: bind
+        source: ./nodered/flows.json
+        target: /data/flows.json
+    depends_on:
+      - mosquitto
+      - influxdb
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - INFLUXDB_ORG=${INFLUXDB_ORG:?Set INFLUXDB_ORG in .env}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET:?Set INFLUXDB_BUCKET in .env}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN:?Set INFLUXDB_TOKEN in .env}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - influxdb
+
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    restart: unless-stopped
+    shm_size: "512m"
+    privileged: false
+    ports:
+      - "${FRIGATE_RTSP_RESTREAM_PORT:-8554}:8554"
+      - "${FRIGATE_WEB_PORT:-8971}:8971"
+    environment:
+      - FRIGATE_RTSP_PASSWORD=${FRIGATE_RTSP_PASSWORD:?Set FRIGATE_RTSP_PASSWORD in .env}
+    devices:
+      - ${FRIGATE_TPU_DEVICE:-/dev/bus/usb}:/dev/bus/usb
+    volumes:
+      - ./frigate/config.yml:/config/config.yml:ro
+      - ${FRIGATE_MEDIA_DIR:-./media}:/media/frigate
+    depends_on:
+      - mosquitto
+
+volumes:
+  mosquitto_data:
+  mosquitto_config:
+  mosquitto_log:
+  influxdb_data:
+  nodered_data:
+  grafana_data:

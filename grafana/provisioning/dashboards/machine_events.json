@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "title": "Machine Events with SensingCam",
+    "uid": "sensingcam-events",
+    "timezone": "browser",
+    "panels": [
+      {
+        "type": "table",
+        "title": "Recent Machine Events",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "InfluxDB"
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "query": "from(bucket: \"${INFLUXDB_BUCKET}\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r._measurement == \"machine_events\")\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> keep(columns: [\"_time\", \"line\", \"camera\", \"event\", \"video\"])"
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "links": [
+              {
+                "title": "Open clip",
+                "url": "${FRIGATE_MEDIA_BASE_URL}/${__value.text}"
+              }
+            ]
+          }
+        },
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 }
+      },
+      {
+        "type": "text",
+        "title": "Live Stream",
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 12 },
+        "options": {
+          "mode": "html",
+          "content": "<iframe src=\"${FRIGATE_RESTREAM_URL}\" width=\"100%\" height=\"400\" frameborder=\"0\" allowfullscreen></iframe>"
+        }
+      }
+    ],
+    "schemaVersion": 38,
+    "version": 1
+  },
+  "folderUid": "sensingcam",
+  "overwrite": true
+}
