@@ -2,8 +2,6 @@
 
 > A batteries-included reference stack for orchestrating a SICK sensingCam SEC110 inside a MING (MQTT, InfluxDB, Node-RED, Grafana) edge deployment with Frigate as the recorder.
 
-> 📌 **Banner placeholder:** Drop a project-specific hero image at `docs/media/overview-banner.png` if you want the README to render a visual banner. Binary assets are intentionally omitted from version control so downstream forks can supply their own branding.
-
 ---
 
 ## Table of Contents
