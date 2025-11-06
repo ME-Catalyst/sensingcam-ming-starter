@@ -35,8 +35,10 @@ services:
       - FLOWS=flows.json
       - TZ=${TZ:-UTC}
     volumes:
-      - ./nodered/flows.json:/data/flows.json
       - nodered_data:/data
+      - type: bind
+        source: ./nodered/flows.json
+        target: /data/flows.json
     depends_on:
       - mosquitto
       - influxdb
@@ -47,10 +49,15 @@ services:
     restart: unless-stopped
     ports:
       - "${GRAFANA_PORT:-3000}:3000"
+    env_file:
+      - .env
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - INFLUXDB_ORG=${INFLUXDB_ORG:?Set INFLUXDB_ORG in .env}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET:?Set INFLUXDB_BUCKET in .env}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN:?Set INFLUXDB_TOKEN in .env}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
