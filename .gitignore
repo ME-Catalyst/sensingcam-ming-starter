@@ -1,6 +1,9 @@
 .env
 .env.local
+# Media assets are ignored by default. Provide documentation-ready binaries through
+# external storage or per-fork overrides instead of committing them to this repo.
 media/
+docs/media/
 node_modules/
 __pycache__/
 .DS_Store
