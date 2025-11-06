@@ -1,0 +1,50 @@
+mqtt:
+  host: mosquitto
+  port: 1883
+  user: ${MOSQUITTO_USERNAME}
+  password: ${MOSQUITTO_PASSWORD}
+
+cameras:
+  sensingcam:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://${SICK_CAMERA_USERNAME}:${SICK_CAMERA_PASSWORD}@${SICK_CAMERA_HOST}/stream1
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1920
+      height: 1080
+      fps: 8
+    record:
+      enabled: true
+      retain:
+        days: 7
+        mode: all
+    snapshots:
+      enabled: true
+      timestamp: true
+      bounding_box: true
+      retain:
+        default: 3
+
+detectors:
+  coral:
+    type: edgetpu
+    device: usb
+
+record:
+  enabled: true
+  retain:
+    days: 7
+    mode: motion
+
+objects:
+  track:
+    - person
+    - forklift
+    - pallet
+
+ui:
+  use_experimental: false
