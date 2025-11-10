@@ -2,7 +2,8 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COMPOSE_FILE="${PROJECT_ROOT}/src/docker-compose.yml"
+SRC_DIR="${PROJECT_ROOT}/src"
+COMPOSE_FILE="${SRC_DIR}/docker-compose.yml"
 DOCKER_COMPOSE_BIN=${DOCKER_COMPOSE:-"docker compose"}
 WAIT_TIMEOUT=${HEALTHCHECK_TIMEOUT:-180}
 POLL_INTERVAL=${HEALTHCHECK_POLL_INTERVAL:-5}
@@ -23,7 +24,7 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
-pushd "$PROJECT_ROOT/src" >/dev/null
+pushd "$SRC_DIR" >/dev/null
 TEMP_ENV_CREATED=0
 if [[ ! -f .env ]]; then
   cp .env.example .env
@@ -45,10 +46,10 @@ fi
 cleanup() {
   $DOCKER_COMPOSE_BIN -f "$COMPOSE_FILE" down --remove-orphans >/dev/null 2>&1 || true
   if [[ $TEMP_ENV_CREATED -eq 1 ]]; then
-    rm -f .env
+    rm -f "${SRC_DIR}/.env"
   fi
   if [[ $MEDIA_TEST_CREATED -eq 1 ]]; then
-    rm -rf media-test
+    rm -rf "${SRC_DIR}/media-test"
   fi
 }
 trap cleanup EXIT INT TERM
