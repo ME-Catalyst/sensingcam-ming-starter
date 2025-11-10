@@ -1,6 +1,19 @@
+# =============================================================================
+# Sensingcam MING + Frigate reference stack
+# -----------------------------------------------------------------------------
+# Purpose : Provide a reproducible development stack that mirrors the production
+#           deployment: MQTT broker, time-series database, automation, Grafana,
+#           and the Frigate NVR pipeline.
+# Usage   : docker compose -f src/docker-compose.yml up -d
+# Notes   : Values default to local developer-friendly ports but respect the
+#           .env overrides used by CI/CD. Storage volumes are named to survive
+#           container recreation.
+# Ownership: Platform Observability Team (observability@sensingcam.example)
+# =============================================================================
 version: "3.9"
 
 services:
+  # --- Message broker for camera and automation events ---
   mosquitto:
     image: eclipse-mosquitto:2
     container_name: mosquitto
@@ -14,6 +27,7 @@ services:
     environment:
       - TZ=${TZ:-UTC}
 
+  # --- Time-series storage for telemetry and dashboards ---
   influxdb:
     image: influxdb:2.7
     container_name: influxdb
@@ -25,6 +39,7 @@ services:
     volumes:
       - influxdb_data:/var/lib/influxdb2
 
+  # --- Node-RED flows for alerting and automation glue ---
   nodered:
     image: nodered/node-red:3.1
     container_name: nodered
@@ -43,6 +58,7 @@ services:
       - mosquitto
       - influxdb
 
+  # --- Grafana dashboarding connected to InfluxDB ---
   grafana:
     image: grafana/grafana:10.4.2
     container_name: grafana
@@ -64,6 +80,7 @@ services:
     depends_on:
       - influxdb
 
+  # --- Frigate video intelligence stack consuming camera streams ---
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: frigate
@@ -84,6 +101,7 @@ services:
       - mosquitto
 
 volumes:
+  # Persistent volumes retain state between container recreations.
   mosquitto_data:
   mosquitto_config:
   mosquitto_log:

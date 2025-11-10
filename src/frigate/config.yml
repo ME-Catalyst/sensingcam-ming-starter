@@ -1,9 +1,21 @@
+# =============================================================================
+# Frigate configuration for the Sensingcam reference deployment
+# -----------------------------------------------------------------------------
+# Purpose : Define MQTT integration, camera ingest, recording policy, and object
+#           detection for the demo environment shipped with the starter stack.
+# Notes   : Environment variables provide credentials injected by docker-compose
+#           so the same file works locally and in CI smoke tests.
+# Ownership: Edge Vision Team (edge-vision@sensingcam.example)
+# =============================================================================
+
+# --- MQTT broker connection used for Frigate events ---
 mqtt:
   host: mosquitto
   port: 1883
   user: ${MOSQUITTO_USERNAME}
   password: ${MOSQUITTO_PASSWORD}
 
+# --- Camera ingest and video retention policy ---
 cameras:
   sensingcam:
     enabled: true
@@ -29,22 +41,26 @@ cameras:
       retain:
         default: 3
 
+# --- Coral TPU accelerator configuration ---
 detectors:
   coral:
     type: edgetpu
     device: usb
 
+# --- Global recording defaults applied to all cameras ---
 record:
   enabled: true
   retain:
     days: 7
     mode: motion
 
+# --- Objects of interest to track for analytics ---
 objects:
   track:
     - person
     - forklift
     - pallet
 
+# --- UI feature toggles ---
 ui:
   use_experimental: false
