@@ -8,7 +8,7 @@ This document outlines a defense-in-depth posture for the sensingCam MING starte
 
 1. **Change default credentials** – Update sensingCam (`main`/`servicelevel`), Mosquitto, Grafana, and InfluxDB credentials before exposing the stack.
 2. **Use digest authentication** – The sensingCam REST API requires HTTP digest auth; scripts and automations should never fall back to basic auth.
-3. **Transport security** – Terminate TLS at a reverse proxy for Grafana and Node-RED. Enable MQTT TLS with per-topic ACLs to limit producers vs consumers.
+3. **Transport security** – Terminate TLS at a reverse proxy for Grafana and Node-RED (the compose stack exposes HTTP by default). Enable MQTT TLS with per-topic ACLs to limit producers vs consumers.
 4. **Network isolation** – Place cameras on an isolated VLAN; only Frigate and Node-RED should reach RTSP/HTTPS endpoints.
 5. **Firmware integrity** – Validate SHA-256 checksums for camera firmware and keep the device on the latest signed release.
 6. **Audit trails** – Configure InfluxDB and Grafana to emit audit logs (Docker volumes provided). Ship logs to a SIEM if available.
@@ -28,6 +28,7 @@ This document outlines a defense-in-depth posture for the sensingCam MING starte
 | InfluxDB | Create scoped API tokens, enable retention policies, configure backup script. | `influx auth list`, `influx backup`. |
 | Grafana | Enable SSO (OAuth/SAML) or enforce strong local passwords, configure alert contact points. | Grafana admin UI > *Configuration*. |
 | Reverse Proxy | Force HTTPS, add HSTS, enable Web Application Firewall (WAF) rules if exposed externally. | SSL Labs scan. |
+| Grafana / Node-RED | Deploy behind the reverse proxy before leaving VLAN_APP; the repository ships without TLS or SSO enabled. | Access attempt outside VLAN should fail. |
 | Logging | Forward Docker logs to centralized store (Loki, ELK). Enable camera syslog if available. | Review aggregator dashboards. |
 
 ---

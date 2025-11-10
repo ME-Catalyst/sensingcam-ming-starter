@@ -51,7 +51,7 @@ flowchart TD
 | Node-RED | Orchestrates the automation pipeline, translating MQTT events into camera REST calls and InfluxDB writes. | Flows are stored in `nodered/flows.json`. |
 | Frigate | Consumes the primary RTSP stream, writes clips to disk, and publishes metadata back to MQTT. | Configure `frigate/config.yml` with camera IP/credentials. |
 | InfluxDB | Persists enriched machine events and camera clip metadata. | Uses Flux queries for dashboards; retention policies recommended. |
-| Grafana | Visualizes timelines, embeds restreams, and exposes ad-hoc analytics to operators. | Provisioning located under `grafana/`. |
+| Grafana | Visualizes timelines, embeds restreams, and exposes ad-hoc analytics to operators. | Provisioning scaffold lives under `grafana/`—add datasources/dashboards before first run. |
 
 ---
 

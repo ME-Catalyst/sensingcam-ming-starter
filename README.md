@@ -90,6 +90,16 @@ sequenceDiagram
 
 ---
 
+## Current Status & Roadmap Alignment
+
+- **Phase 1 – Proof of Concept:** ✅ Baseline compose stack, Node-RED flows, Frigate configuration, and verification scripts are committed. Lab validation with an actual sensingCam and the first Grafana dashboard build-out remain to be executed.
+- **Phase 2 – Hardened Pilot:** 🚧 Planning started. TLS termination, retention policies, and automated health-check alerting are queued until credentials and infrastructure endpoints are provisioned.
+- **Phase 3 – Production Roll-out:** ⏳ Not started. Redundancy design, off-host backups, and cloud mirroring are open follow-up items once pilot milestones close.
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the detailed backlog, checklists, and current progress notes.
+
+---
+
 ## Fast Track: Bring-Up Checklist
 
 Follow this condensed checklist to move from clone → first event in under an hour:
@@ -122,14 +132,14 @@ Follow this condensed checklist to move from clone → first event in under an h
 | Mosquitto | `mosquitto` | MQTT broker for PLC alarms and Frigate events. | `1883/tcp` | `/var/lib/mosquitto` volume |
 | Node-RED  | `nodered`   | Automation workflows that invoke camera REST APIs and write to InfluxDB. | `1880/tcp` | `/data` volume |
 | InfluxDB  | `influxdb`  | Time-series database for `machine_events` measurement. | `8086/tcp` | `/var/lib/influxdb2` |
-| Grafana   | `grafana`   | Visualization layer with event timelines and clip playback. | `3000/tcp` | `/var/lib/grafana` |
+| Grafana   | `grafana`   | Visualization layer with event timelines and clip playback. (Ships without default dashboards—add JSON under `grafana/provisioning/`.) | `3000/tcp` | `/var/lib/grafana` |
 | Frigate   | `frigate`   | NVR that ingests RTSP stream, stores clips, and restreams for Grafana. | `8554/tcp`, `8971/tcp` | `/media`, `/config` |
 
 Additional folders:
 
 - [`frigate/`](frigate) – Frigate camera configuration.
 - [`nodered/`](nodered) – Exported flows for automation logic.
-- [`grafana/`](grafana) – Provisioned dashboards and data sources.
+- [`grafana/`](grafana) – Provisioning scaffold for dashboards and data sources (create your own JSON/YAML before first run).
 - [`scripts/`](scripts) – Bash utilities to validate and exercise the integration.
 
 ---
@@ -168,7 +178,7 @@ Use Node-RED environment variables (`SENSINGCAM_HOST`, `SENSINGCAM_USER`, etc.) 
 
 ## Operational Dashboards
 
-Grafana ships with a starter dashboard that correlates InfluxDB measurements with Frigate media. Customize it by adding:
+Grafana is bundled but unopinionated—no dashboards are pre-provisioned. After launching the stack, import your own starter dashboard that correlates InfluxDB measurements with Frigate media. Suggested panels include:
 
 - **Timeline panel** showing `machine_events` grouped by production line.
 - **Stat panel** summarizing last anomaly per station.
@@ -176,6 +186,8 @@ Grafana ships with a starter dashboard that correlates InfluxDB measurements wit
 - **Ad-hoc filters** for severity, line, and shift.
 
 > Tip: When embedding Frigate streams, enable signed URLs or IP restrictions at the proxy to prevent unauthorized access.
+
+Until TLS and reverse-proxy hardening from Phase 2 land, Grafana and Node-RED run on HTTP inside the edge VLAN. Plan to front them with a zero-trust gateway before exposing beyond the OT network.
 
 For deeper observability, consider enabling:
 

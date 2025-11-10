@@ -1,31 +1,43 @@
 # Roadmap
 
-A suggested progression from proof-of-concept to production. Adjust timelines and deliverables to match your organization's change management process.
+A suggested progression from proof-of-concept to production. Adjust sequencing and deliverables to match your organization's change management process.
 
 ---
 
-## Phase 1 – Proof of Concept (Weeks 0-2)
+## Current Progress Snapshot
 
-- Validate sensingCam connectivity and REST control flow using `scripts/test_camera_api.sh`.
-- Stand up the Docker Compose stack locally; ingest sample PLC events to Frigate.
-- Instrument Node-RED flows to correlate Frigate clip paths with MQTT event metadata.
-- Build an initial Grafana dashboard with a live restream panel and event timeline.
-- Document lessons learned in [`docs/OPERATIONS.md`](OPERATIONS.md) for future onboarding.
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 1 – Proof of Concept | ⚙️ In progress | Compose stack, Node-RED flows, Frigate config, and verification scripts are committed. Awaiting hands-on camera validation and first Grafana dashboard import. |
+| Phase 2 – Hardened Pilot | 🕒 Not started | TLS termination, retention policies, and alerting automation queued until Phase 1 exit criteria are met and credentials are issued. |
+| Phase 3 – Production Roll-out | ⛔ Not started | Redundancy, off-host backups, and cloud mirroring will kick off after the pilot hardening cycle. |
+| Stretch Goals | Backlog | Remain aspirational items to evaluate after steady-state production. |
+
+---
+
+## Phase 1 – Proof of Concept
+
+- [x] Scaffold scripts and flows to validate sensingCam connectivity (`scripts/test_camera_api.sh`, `nodered/flows.json`).
+- [x] Commit a Docker Compose stack that runs Mosquitto, Node-RED, Frigate, InfluxDB, and Grafana together.
+- [x] Provide Node-RED flows that correlate Frigate clip paths with MQTT event metadata.
+- [ ] Run the stack against a live sensingCam and ingest sample PLC events to confirm end-to-end behaviour.
+- [ ] Build and import the first Grafana dashboard (JSON export) with live restream and event timeline panels.
+- [ ] Document lab findings in [`docs/OPERATIONS.md`](OPERATIONS.md) after hardware validation.
 
 **Exit Criteria**
 
-- First anomaly-to-clip workflow demonstrated end-to-end.
+- First anomaly-to-clip workflow demonstrated end-to-end against the target sensingCam.
 - Stakeholders sign off on video quality, retention, and event metadata structure.
 
 ---
 
-## Phase 2 – Hardened Pilot (Weeks 3-6)
+## Phase 2 – Hardened Pilot
 
-- Enable TLS for Mosquitto and Grafana; integrate with enterprise identity provider.
-- Deploy InfluxDB retention policies and downsampling tasks to manage clip metadata growth.
-- Build Grafana dashboards that juxtapose live HLS playback with anomaly KPIs.
-- Introduce automated health checks (`scripts/verify_stack.sh` in CI or cron) and alerting for service downtime.
-- Conduct tabletop exercise covering credential rotation and incident response.
+- [ ] Enable TLS for Mosquitto and Grafana; integrate with enterprise identity provider.
+- [ ] Deploy InfluxDB retention policies and downsampling tasks to manage clip metadata growth.
+- [ ] Build Grafana dashboards that juxtapose live HLS playback with anomaly KPIs.
+- [ ] Introduce automated health checks (`scripts/verify_stack.sh` in CI or cron) and alerting for service downtime.
+- [ ] Conduct tabletop exercise covering credential rotation and incident response.
 
 **Exit Criteria**
 
@@ -34,13 +46,13 @@ A suggested progression from proof-of-concept to production. Adjust timelines an
 
 ---
 
-## Phase 3 – Production Roll-out (Weeks 7-12)
+## Phase 3 – Production Roll-out
 
-- Deploy redundant brokers and databases (InfluxDB high availability / clustering strategy).
-- Integrate predictive maintenance analytics leveraging Frigate object detection metrics.
-- Automate firmware audits and backups for sensingCam devices via CI/CD pipelines.
-- Mirror Frigate clips to object storage (S3/MinIO) with lifecycle policies.
-- Implement centralized logging (Loki/ELK) with retention aligned to compliance requirements.
+- [ ] Deploy redundant brokers and databases (InfluxDB high availability / clustering strategy).
+- [ ] Integrate predictive maintenance analytics leveraging Frigate object detection metrics.
+- [ ] Automate firmware audits and backups for sensingCam devices via CI/CD pipelines.
+- [ ] Mirror Frigate clips to object storage (S3/MinIO) with lifecycle policies.
+- [ ] Implement centralized logging (Loki/ELK) with retention aligned to compliance requirements.
 
 **Exit Criteria**
 
@@ -59,20 +71,16 @@ A suggested progression from proof-of-concept to production. Adjust timelines an
 
 ---
 
-## Visual Timeline
+## Phase Sequencing Overview
 
 ```mermaid
-gantt
-    title sensingCam Deployment Journey
-    dateFormat  YYYY-MM-DD
-    section Phase 1
-    PoC Build                 :2025-02-01, 14d
-    section Phase 2
-    Pilot Hardening           :2025-02-15, 28d
-    section Phase 3
-    Production Roll-out       :2025-03-15, 35d
-    section Stretch
-    Advanced Analytics & Sync :2025-04-20, 45d
+flowchart TD
+    Phase1[Phase 1 – Proof of Concept]
+    Phase2[Phase 2 – Hardened Pilot]
+    Phase3[Phase 3 – Production Roll-out]
+    Stretch[Stretch Goals]
+
+    Phase1 --> Phase2 --> Phase3 --> Stretch
 ```
 
-Use the diagram as a planning aid—update durations to match your sprint cadence.
+Use the diagram as a planning aid—update milestone ordering to match your delivery cadence.

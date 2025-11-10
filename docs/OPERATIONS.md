@@ -89,3 +89,11 @@ flowchart LR
 | Security Officer | security@example.com | PagerDuty rotation `Security-OnCall`. |
 
 Update contacts after staffing changes and ensure on-call schedules cover maintenance windows.
+
+---
+
+## Known Gaps (Aligns with Roadmap)
+
+- Grafana and Node-RED currently expose HTTP endpoints only. Introduce a reverse proxy with TLS and SSO during Phase 2.
+- No default dashboards ship with the repo. Create and version-control JSON exports under `grafana/provisioning/` as part of the Phase 1 exit criteria.
+- Health-check automation exists as `scripts/verify_stack.sh` but is not yet wired into cron/CI. Schedule it and connect alerts before production rollout.
