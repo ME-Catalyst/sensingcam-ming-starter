@@ -1,53 +1,28 @@
 # Architecture Overview
 
-This snapshot provides an entry point into the sensingCam MING Starter architecture. Detailed diagrams, component inventories, and data models remain authoritative in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
-
----
+This document summarizes the layered structure of the sensingCam MING Starter. Detailed diagrams, data models, and engineering notes reside under [`docs/architecture/`](docs/architecture/).
 
 ## Layered Stack
+1. **Field Layer** – sensingCam SEC110 and PLCs originate events and dual RTSP streams.
+2. **Edge Compute Layer** – Mosquitto, Node-RED, and Frigate convert events into context-rich clips.
+3. **Data Layer** – InfluxDB preserves anomaly metadata with retention aligned to plant requirements.
+4. **Experience Layer** – Grafana provides dashboards and review workflows.
 
-The stack aligns to four layers:
+Refer to [`docs/architecture/data_flow.md`](docs/architecture/data_flow.md) for sequence diagrams and topic mappings.
 
-1. **Field Layer** – sensingCam SEC110 and PLCs generate deterministic signals.
-2. **Edge Compute Layer** – Mosquitto, Node-RED, and Frigate react to events and capture video context.
-3. **Data Layer** – InfluxDB persists enriched machine and clip metadata.
-4. **Experience Layer** – Grafana and operators consume dashboards and insights.
-
-See [`docs/ARCHITECTURE.md#layered-view`](docs/ARCHITECTURE.md#layered-view) for the mermaid diagram illustrating relationships and data flow across layers.
-
----
-
-## Core Components
-
-| Component | Role | Deep Dive |
-|-----------|------|-----------|
-| sensingCam SEC110 | Dual-RTSP camera with REST control for event-triggered recording. | [`docs/CAMERA_GUIDE.md`](docs/CAMERA_GUIDE.md) |
-| Mosquitto | MQTT broker handling PLC alarms and Frigate metadata. | [`docs/ARCHITECTURE.md#component-responsibilities`](docs/ARCHITECTURE.md#component-responsibilities) |
-| Node-RED | Automation logic bridging MQTT events, camera control, and InfluxDB writes. | [`docs/OPERATIONS.md#automation-flows`](docs/OPERATIONS.md#automation-flows) |
-| Frigate | NVR capturing RTSP streams and publishing clip events. | [`docs/ARCHITECTURE.md#component-responsibilities`](docs/ARCHITECTURE.md#component-responsibilities) |
-| InfluxDB | Time-series store for `machine_events` measurement. | [`docs/ARCHITECTURE.md#data-model`](docs/ARCHITECTURE.md#data-model) |
-| Grafana | Visualization layer for dashboards and restreams. | [`docs/OPERATIONS.md#operational-dashboards`](docs/OPERATIONS.md#operational-dashboards) |
-
----
-
-## Event Timeline
-
-A standard anomaly-to-clip workflow follows this sequence:
-
-1. PLC publishes an event on `machine/alert`.
-2. Node-RED issues `POST /api/v1/event/recording/start` to the sensingCam.
-3. Frigate ingests the RTSP stream, writes the clip, and emits metadata on `frigate/events`.
-4. Node-RED correlates metadata and writes to InfluxDB (`machine_events`).
-5. Grafana queries InfluxDB to surface the event timeline and video link.
-
-Detailed timing considerations and sequence diagrams are captured in [`docs/ARCHITECTURE.md#event-sequence`](docs/ARCHITECTURE.md#event-sequence).
-
----
+## Component Responsibilities
+| Component | Responsibility | Reference |
+|-----------|----------------|-----------|
+| sensingCam SEC110 | Supplies RTSP streams and REST event hooks. | [`docs/user/configuration.md`](docs/user/configuration.md) |
+| Mosquitto | Routes PLC alarms and Frigate metadata. | [`docs/architecture/data_flow.md`](docs/architecture/data_flow.md) |
+| Node-RED | Orchestrates REST calls and InfluxDB writes. | [`docs/developer/internal_apis.md`](docs/developer/internal_apis.md) |
+| Frigate | Captures video clips and exposes detection metadata. | [`docs/architecture/diagrams/system_overview.md`](docs/architecture/diagrams/system_overview.md) |
+| InfluxDB | Stores `machine_events` time-series. | [`docs/developer/conventions.md`](docs/developer/conventions.md) |
+| Grafana | Visualizes correlated signals. | [`docs/user/advanced_usage.md`](docs/user/advanced_usage.md) |
 
 ## Deployment Considerations
+- **Networking:** VLAN boundaries and firewall rules are documented in [`docs/architecture/diagrams/io_map.md`](docs/architecture/diagrams/io_map.md).
+- **Security:** Harden camera credentials, MQTT auth, and TLS per [`docs/troubleshooting/recovery.md`](docs/troubleshooting/recovery.md).
+- **Storage:** Volume sizing guidance lives alongside diagrams in [`docs/architecture/data_flow.md`](docs/architecture/data_flow.md).
 
-- **Networking:** VLAN isolation keeps camera traffic segregated—see [`docs/NETWORKING.md`](docs/NETWORKING.md).
-- **Security:** Apply the checklist in [`docs/SECURITY.md`](docs/SECURITY.md) before exposing the stack beyond the OT network.
-- **Storage:** Size Docker volumes for Frigate media, InfluxDB buckets, and Grafana state per [`docs/ARCHITECTURE.md#volume--storage-layout`](docs/ARCHITECTURE.md#volume--storage-layout).
-
-For operational procedures, continue with the [User Manual](USER_MANUAL.md) and [Troubleshooting Guide](TROUBLESHOOTING.md).
+For installation, see the [User Manual](USER_MANUAL.md). Development specifics are tracked in the [Developer Reference](DEVELOPER_REFERENCE.md).

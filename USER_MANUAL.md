@@ -1,94 +1,31 @@
 # User Manual
 
-This manual walks operators and integrators through deploying, operating, and maintaining the sensingCam MING Starter. For extended procedures, diagrams, and deep dives, follow the links into the `docs/` directory.
+Follow this guide to bring the sensingCam MING Starter online and adapt it to your facility. Expanded walkthroughs, screenshots, and configuration matrices reside in [`docs/user/`](docs/user/).
 
----
+## 1. Prerequisites
+- Docker Engine 24+ with Compose Plugin.
+- Access to a SICK sensingCam SEC110 (or emulator) reachable from the host.
+- `mosquitto-clients`, `curl`, and `jq` installed for verification scripts.
 
-## Audience & Prerequisites
+## 2. Installation
+1. Clone the repository and review the [Quickstart](README.md#quickstart).
+2. Copy `src/.env.example` to `src/.env` and provide camera credentials, MQTT passwords, and Grafana seeds.
+3. Adjust `src/frigate/config.yml` with RTSP URLs and retention preferences.
+4. Launch the stack using `docker compose -f src/docker-compose.yml up -d`.
+5. Validate service health with `scripts/verify_stack.sh` and `scripts/test_camera_api.sh`.
 
-- **Audience:** Controls engineers, automation specialists, and operators responsible for day-to-day use of the stack.
-- **Prerequisites:**
-  - Docker Engine and Docker Compose installed on the edge host.
-  - Access to a sensingCam SEC110 with firmware aligned to the guidance in [`docs/CAMERA_GUIDE.md`](docs/CAMERA_GUIDE.md).
-  - Network connectivity that matches the VLAN and firewall layout in [`docs/NETWORKING.md`](docs/NETWORKING.md).
-  - Rotated credentials stored securely, following the checklist in [`docs/SECURITY.md`](docs/SECURITY.md).
+Detailed installation notes, including offline deployments and proxy-aware instructions, are stored in [`docs/user/install_guide.md`](docs/user/install_guide.md).
 
----
+## 3. Configuration
+- Customize Node-RED flows under `src/nodered/flows.json` to match topic names.
+- Update Grafana provisioning files in `src/grafana/` to import dashboards automatically.
+- Review retention and bucket policies for InfluxDB per [`docs/user/configuration.md`](docs/user/configuration.md).
 
-## First-Time Setup
+## 4. Validation
+Confirm the end-to-end workflow:
+1. Publish a PLC anomaly (`machine/alert/test`) via `mosquitto_pub`.
+2. Observe Node-RED logs for REST triggers.
+3. Verify Frigate clip creation and metadata emission.
+4. Refresh Grafana to confirm the event timeline populates.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/<org>/sensingcam-ming-starter.git
-   cd sensingcam-ming-starter
-   ```
-2. **Populate configuration**
-   - Copy `src/.env.example` → `src/.env` and fill in MQTT, camera, InfluxDB, and Grafana credentials.
-   - Update `src/frigate/config.yml` with the sensingCam IP, stream profiles, and authentication tokens (see [`docs/CAMERA_GUIDE.md#stream-profiles`](docs/CAMERA_GUIDE.md#stream-profiles)). Start from `examples/frigate/config.yml` if you need a template.
-   - Prepare persistent directories (`./media`, `./src/nodered/data`, `./src/grafana/data`) with appropriate permissions if you choose to bind mount instead of named volumes.
-3. **Launch the stack**
-   ```bash
-   docker compose -f src/docker-compose.yml up -d
-   scripts/verify_stack.sh
-   ```
-   The verification script exercises container health and MQTT flows. Extend it per [`docs/OPERATIONS.md#health-checks`](docs/OPERATIONS.md#health-checks).
-4. **Load automations and dashboards**
-   - Import `src/nodered/flows.json` through the Node-RED editor.
-   - Provision Grafana datasources and dashboards using the scaffolding under [`src/grafana/provisioning/`](src/grafana/).
-   - Capture configuration exports in version control per [`docs/OPERATIONS.md#change-management`](docs/OPERATIONS.md#change-management).
-
----
-
-## Routine Operations
-
-### Daily Checklist
-
-Follow the tasks summarized below; detailed runbooks live in [`docs/OPERATIONS.md#daily-tasks`](docs/OPERATIONS.md#daily-tasks).
-
-- Confirm Grafana dashboards render live streams and timelines.
-- Validate Node-RED flows show no error badges and MQTT nodes remain connected.
-- Inspect Frigate storage utilization and archive clips when nearing retention thresholds.
-- Check MQTT broker metrics via `$SYS/` topics to ensure expected clients are connected.
-
-### Weekly Checklist
-
-- Export Node-RED flows and Grafana dashboards for backups.
-- Run `scripts/verify_stack.sh` and review the output for regressions.
-- Validate InfluxDB backups completed; investigate failures immediately.
-
----
-
-## Working with Events
-
-1. Trigger an anomaly from the PLC or use `scripts/test_camera_api.sh` for a synthetic run.
-2. Monitor Node-RED debug logs to confirm REST calls return `200` responses.
-3. Verify the clip appears in Frigate and that metadata is written to InfluxDB (`machine_events`).
-4. Refresh Grafana dashboards to see the correlated timeline entry. Troubleshooting tips are consolidated in the [Troubleshooting Guide](TROUBLESHOOTING.md) and in [`docs/OPERATIONS.md#troubleshooting-recipes`](docs/OPERATIONS.md#troubleshooting-recipes).
-
----
-
-## Security & Compliance Reminders
-
-- Rotate credentials during each maintenance window; document changes in the [Changelog](CHANGELOG.md) and update vault entries.
-- Enable TLS, admin authentication, and reverse proxies as described in [`docs/SECURITY.md#core-controls`](docs/SECURITY.md#core-controls).
-- Capture incident response drills using the playbook in [`docs/SECURITY.md#incident-response-playbook`](docs/SECURITY.md#incident-response-playbook).
-
----
-
-## When to Escalate
-
-Use the contact roster in [`docs/OPERATIONS.md#contacts--escalation`](docs/OPERATIONS.md#contacts--escalation) if:
-
-- MQTT queues persistently back up.
-- Camera recordings fail repeatedly across shifts.
-- Grafana dashboards or Frigate restreams remain unavailable after initial troubleshooting.
-
----
-
-## Additional Resources
-
-- [Architecture Overview](ARCHITECTURE.md) for context on system components and data flow.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) to understand upcoming changes that may affect operational procedures.
-- [`docs/SECURITY.md`](docs/SECURITY.md) and [`docs/NETWORKING.md`](docs/NETWORKING.md) for policy-aligned configuration details.
-
-Keep this manual updated alongside configuration changes to ensure shift teams rely on current instructions.
+Advanced walkthroughs, including pilot hardening tasks, live in [`docs/user/advanced_usage.md`](docs/user/advanced_usage.md).

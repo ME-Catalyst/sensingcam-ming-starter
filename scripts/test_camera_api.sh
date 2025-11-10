@@ -4,7 +4,6 @@
 #            credentials before the Frigate pipeline attempts to ingest video.
 # Usage    : SICK_CAMERA_HOST=... [SICK_CAMERA_USERNAME=main] \
 #            [SICK_CAMERA_PASSWORD=servicelevel] ./scripts/test_camera_api.sh
-# Ownership: Edge Vision Team (edge-vision@sensingcam.example)
 # =============================================================================
 set -euo pipefail
 
