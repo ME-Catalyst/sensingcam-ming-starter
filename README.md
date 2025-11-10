@@ -205,6 +205,8 @@ For deeper observability, consider enabling:
 | [`scripts/seed_influx_bucket.sh`](scripts/seed_influx_bucket.sh) | Writes a sample point to InfluxDB for dashboard bootstrapping. | `./scripts/seed_influx_bucket.sh` |
 | [`scripts/verify_stack.sh`](scripts/verify_stack.sh) | Checks container status, health endpoints, and essential ports after deployment. | `./scripts/verify_stack.sh` |
 
+> `scripts/verify_stack.sh` requires `mosquitto_pub` (provided by the `mosquitto-clients` package on Debian/Ubuntu) to perform the MQTT broker health check.
+
 Extend the `scripts/` directory with Ansible playbooks or Python utilities as your deployment matures.
 
 ---

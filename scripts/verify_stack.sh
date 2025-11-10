@@ -3,10 +3,19 @@ set -euo pipefail
 
 COMPOSE=${COMPOSE_CMD:-docker compose}
 
+if ! command -v mosquitto_pub >/dev/null 2>&1; then
+  echo "mosquitto_pub is required to verify the MQTT broker. Install the mosquitto-clients package." >&2
+  exit 1
+fi
+
 ${COMPOSE} ps
 
-curl --silent --show-error --fail http://localhost:${MOSQUITTO_PORT:-1883} >/dev/null 2>&1 && \
-  echo "Mosquitto port open"
+mosquitto_pub \
+  -h "${MOSQUITTO_HOST:-localhost}" \
+  -p "${MOSQUITTO_PORT:-1883}" \
+  -t "${MOSQUITTO_HEALTH_TOPIC:-verify_stack/healthcheck}" \
+  -n >/dev/null 2>&1 && \
+  echo "Mosquitto broker reachable"
 
 curl --silent --show-error --fail http://localhost:${NODERED_PORT:-1880} >/dev/null 2>&1 && \
   echo "Node-RED UI reachable"
