@@ -4,8 +4,9 @@ A reproducible reference stack that couples a SICK sensingCam SEC110 with the MI
 
 ## Quickstart
 1. **Clone and configure** – Copy `src/.env.example` to `src/.env`, populate camera and service credentials, and review `src/frigate/config.yml` for stream details.
-2. **Launch services** – Start the stack with `docker compose -f src/docker-compose.yml up -d` and confirm container health using `scripts/verify_stack.sh`.
-3. **Trigger a flow** – Execute `scripts/test_camera_api.sh` (after exporting `SICK_CAMERA_HOST`) or publish a PLC anomaly to see Frigate clips and Grafana timelines populate.
+2. **Generate MQTT credentials** – Run `scripts/generate_mosquitto_passwords.sh` to create the password file consumed by the Mosquitto container.
+3. **Launch services** – Start the stack with `docker compose -f src/docker-compose.yml up -d` and confirm container health using `scripts/verify_stack.sh`.
+4. **Trigger a flow** – Execute `scripts/test_camera_api.sh` (after exporting `SICK_CAMERA_HOST`) or publish a PLC anomaly to see Frigate clips and Grafana timelines populate.
 
 ## Stack at a Glance
 | Service | Role | Default Ports |

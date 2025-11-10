@@ -7,6 +7,16 @@
 # =============================================================================
 set -euo pipefail
 
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC_DIR="${PROJECT_ROOT}/src"
+
+if [[ -f "${SRC_DIR}/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "${SRC_DIR}/.env"
+  set +a
+fi
+
 # Allow custom compose binaries (e.g., podman) and alternate compose files so
 # the script mirrors the environment invoked by CI or bespoke deployments.
 COMPOSE=${COMPOSE_CMD:-docker compose}
@@ -27,6 +37,8 @@ fi
 mosquitto_pub \
   -h "${MOSQUITTO_HOST:-localhost}" \
   -p "${MOSQUITTO_PORT:-1883}" \
+  -u "${MOSQUITTO_USERNAME:?MOSQUITTO_USERNAME not set}" \
+  -P "${MOSQUITTO_PASSWORD:?MOSQUITTO_PASSWORD not set}" \
   -t "${MOSQUITTO_HEALTH_TOPIC:-verify_stack/healthcheck}" \
   -n >/dev/null 2>&1 && \
   echo "Mosquitto broker reachable"
