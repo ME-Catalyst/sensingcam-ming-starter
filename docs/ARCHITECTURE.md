@@ -48,10 +48,10 @@ flowchart TD
 |-----------|-----------------|-------|
 | sensingCam SEC110 | Streams dual RTSP feeds, exposes REST API for event recordings, buffers 6 GB of rolling footage. | Configure pre/post-roll, codec, bitrate per use case. |
 | Mosquitto | MQTT broker for ingesting PLC alarms and distributing Frigate clip notifications. | Use ACLs and TLS to separate publishers/consumers. |
-| Node-RED | Orchestrates the automation pipeline, translating MQTT events into camera REST calls and InfluxDB writes. | Flows are stored in `nodered/flows.json`. |
-| Frigate | Consumes the primary RTSP stream, writes clips to disk, and publishes metadata back to MQTT. | Configure `frigate/config.yml` with camera IP/credentials. |
+| Node-RED | Orchestrates the automation pipeline, translating MQTT events into camera REST calls and InfluxDB writes. | Flows are stored in `src/nodered/flows.json`. |
+| Frigate | Consumes the primary RTSP stream, writes clips to disk, and publishes metadata back to MQTT. | Configure `src/frigate/config.yml` with camera IP/credentials (seeded by `examples/frigate/config.yml`). |
 | InfluxDB | Persists enriched machine events and camera clip metadata. | Uses Flux queries for dashboards; retention policies recommended. |
-| Grafana | Visualizes timelines, embeds restreams, and exposes ad-hoc analytics to operators. | Provisioning scaffold lives under `grafana/`—add datasources/dashboards before first run. |
+| Grafana | Visualizes timelines, embeds restreams, and exposes ad-hoc analytics to operators. | Provisioning scaffold lives under `src/grafana/`—add datasources/dashboards before first run. |
 
 ---
 
@@ -113,7 +113,7 @@ Key timing considerations:
 
 ## Extensibility Patterns
 
-- **Multiple Cameras**: Add additional camera definitions in `frigate/config.yml` and replicate Node-RED trigger nodes with camera-specific credentials.
+- **Multiple Cameras**: Add additional camera definitions in `src/frigate/config.yml` and replicate Node-RED trigger nodes with camera-specific credentials.
 - **Advanced Analytics**: Forward Frigate object detection events to an external inference service via MQTT or HTTP nodes.
 - **Hybrid Storage**: Mirror Frigate clips to S3/MinIO using Frigate's built-in uploaders for long-term retention.
 - **Edge-to-Cloud Sync**: Use InfluxDB replication or Telegraf to push summarized metrics to a central historian.
@@ -157,9 +157,9 @@ graph LR
 | Service | Path | Contents |
 |---------|------|----------|
 | Frigate | `./media` | Camera recordings, snapshots, restream cache. Size accordingly for retention needs. |
-| Node-RED | `./nodered/data` (via volume) | Flow definitions, credential store, editor state. |
+| Node-RED | `./src/nodered/data` (via bind mount) or `nodered_data` (named volume) | Flow definitions, credential store, editor state. |
 | InfluxDB | `./influxdb` (via volume) | Buckets, tokens, task metadata. Snapshot for backups. |
-| Grafana | `./grafana/data` (via volume) | SQLite database, plugin cache, provisioning overrides. |
+| Grafana | `./src/grafana/data` (via bind mount) or `grafana_data` (named volume) | SQLite database, plugin cache, provisioning overrides. |
 
 Back up volumes regularly or mount to network storage if the edge host is not persistent.
 
@@ -167,10 +167,10 @@ Back up volumes regularly or mount to network storage if the edge host is not pe
 
 ## Configuration Sources
 
-- `.env` – Centralized credentials and connection info consumed by Docker Compose and Node-RED.
-- `frigate/config.yml` – Camera definitions, retention rules, recording profiles.
-- `nodered/flows.json` – Automation graph; import via editor or mount to `/data/flows.json`.
-- `grafana/provisioning/` – Datasource and dashboard definitions, version controlled.
+- `src/.env` – Centralized credentials and connection info consumed by Docker Compose and Node-RED.
+- `src/frigate/config.yml` – Camera definitions, retention rules, recording profiles (seeded by `examples/frigate/config.yml`).
+- `src/nodered/flows.json` – Automation graph; import via editor or mount to `/data/flows.json`.
+- `src/grafana/provisioning/` – Datasource and dashboard definitions, version controlled.
 - `scripts/*.sh` – Verification and bootstrap utilities.
 
 Keep production secrets out of source control by using Docker secrets, environment files stored in a vault, or CI/CD injectors.

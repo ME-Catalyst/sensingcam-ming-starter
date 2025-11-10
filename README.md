@@ -105,17 +105,17 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the detailed backlog, checklists, a
 Follow this condensed checklist to move from clone → first event in under an hour:
 
 1. **Bootstrap configuration**
-   - Copy `.env.example` → `.env` and populate credentials.
+   - Copy `src/.env.example` → `src/.env` and populate credentials.
    - Create a persistent directory (`./media`) for Frigate recordings.
-   - Adjust `frigate/config.yml` with the sensingCam IP and RTSP credentials.
+   - Adjust `src/frigate/config.yml` (or start from `examples/frigate/config.yml`) with the sensingCam IP and RTSP credentials.
 2. **Prepare secrets**
    - Rotate *all* default passwords before deployment (Grafana, InfluxDB, Mosquitto, Node-RED admin).
    - Store long-lived API tokens in Docker secrets or an external vault.
 3. **Launch the stack**
-   - `docker compose up -d`
+   - `docker compose -f src/docker-compose.yml up -d`
    - Verify container health via `scripts/verify_stack.sh`.
 4. **Load automations**
-   - Import `nodered/flows.json` through the Node-RED editor (or mount at `/data/flows.json`).
+   - Import `src/nodered/flows.json` through the Node-RED editor (or mount at `/data/flows.json`).
    - Configure Node-RED environment variables for MQTT and camera credentials.
 5. **Validate end-to-end**
    - Trigger a PLC anomaly (or `scripts/test_camera_api.sh`) to kick off a camera recording.
@@ -132,21 +132,21 @@ Follow this condensed checklist to move from clone → first event in under an h
 | Mosquitto | `mosquitto` | MQTT broker for PLC alarms and Frigate events. | `1883/tcp` | `/var/lib/mosquitto` volume |
 | Node-RED  | `nodered`   | Automation workflows that invoke camera REST APIs and write to InfluxDB. | `1880/tcp` | `/data` volume |
 | InfluxDB  | `influxdb`  | Time-series database for `machine_events` measurement. | `8086/tcp` | `/var/lib/influxdb2` |
-| Grafana   | `grafana`   | Visualization layer with event timelines and clip playback. (Ships without default dashboards—add JSON under `grafana/provisioning/`.) | `3000/tcp` | `/var/lib/grafana` |
+| Grafana   | `grafana`   | Visualization layer with event timelines and clip playback. (Ships without default dashboards—add JSON under `src/grafana/provisioning/`.) | `3000/tcp` | `/var/lib/grafana` |
 | Frigate   | `frigate`   | NVR that ingests RTSP stream, stores clips, and restreams for Grafana. | `8554/tcp`, `8971/tcp` | `/media`, `/config` |
 
 Additional folders:
 
-- [`frigate/`](frigate) – Frigate camera configuration.
-- [`nodered/`](nodered) – Exported flows for automation logic.
-- [`grafana/`](grafana) – Provisioning scaffold for dashboards and data sources (create your own JSON/YAML before first run).
+- [`src/`](src) – Primary runtime assets including the compose file, service configurations, and flows.
+- [`examples/`](examples) – Sample configurations (e.g., `examples/frigate/config.yml`) to copy before customizing the stack.
 - [`scripts/`](scripts) – Bash utilities to validate and exercise the integration.
+- [`tests/`](tests) – Placeholder for smoke and integration validation assets (expand with CI-friendly checks).
 
 ---
 
 ## Automation Flow
 
-Node-RED is the glue that synchronizes PLC signals with camera control and metadata ingestion. The default flow (imported from `nodered/flows.json`) is structured as follows:
+Node-RED is the glue that synchronizes PLC signals with camera control and metadata ingestion. The default flow (imported from `src/nodered/flows.json`) is structured as follows:
 
 1. **MQTT In**: Subscribes to `machine/alerts/#` topics from PLCs.
 2. **Event Normalizer**: Standardizes payloads into `{line, station, severity}` fields.

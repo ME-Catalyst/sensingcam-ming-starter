@@ -17,7 +17,7 @@ Operational guidance for keeping the sensingCam MING stack healthy after day one
 
 ## Weekly Tasks
 
-1. Export Node-RED flows (`Menu → Export → Selected nodes`) and store in source control.
+1. Export Node-RED flows (`Menu → Export → Selected nodes`) and store in source control alongside `src/nodered/flows.json`.
 2. Run `scripts/verify_stack.sh` to ensure containers respond to health checks (requires `mosquitto_pub` from the `mosquitto-clients` package).
 3. Confirm InfluxDB backups succeed (see [Backups](#backups)).
 4. Review Grafana alerts for noise; tune thresholds if needed.
@@ -95,5 +95,5 @@ Update contacts after staffing changes and ensure on-call schedules cover mainte
 ## Known Gaps (Aligns with Roadmap)
 
 - Grafana and Node-RED currently expose HTTP endpoints only. Introduce a reverse proxy with TLS and SSO during Phase 2.
-- No default dashboards ship with the repo. Create and version-control JSON exports under `grafana/provisioning/` as part of the Phase 1 exit criteria.
+- No default dashboards ship with the repo. Create and version-control JSON exports under `src/grafana/provisioning/` as part of the Phase 1 exit criteria.
 - Health-check automation exists as `scripts/verify_stack.sh` but is not yet wired into cron/CI. Schedule it and connect alerts before production rollout.

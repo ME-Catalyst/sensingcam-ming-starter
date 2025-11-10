@@ -23,18 +23,18 @@ This manual walks operators and integrators through deploying, operating, and ma
    cd sensingcam-ming-starter
    ```
 2. **Populate configuration**
-   - Copy `.env.example` → `.env` and fill in MQTT, camera, InfluxDB, and Grafana credentials.
-   - Update `frigate/config.yml` with the sensingCam IP, stream profiles, and authentication tokens (see [`docs/CAMERA_GUIDE.md#stream-profiles`](docs/CAMERA_GUIDE.md#stream-profiles)).
-   - Prepare persistent directories (`./media`, `./nodered/data`, `./grafana/data`) with appropriate permissions.
+   - Copy `src/.env.example` → `src/.env` and fill in MQTT, camera, InfluxDB, and Grafana credentials.
+   - Update `src/frigate/config.yml` with the sensingCam IP, stream profiles, and authentication tokens (see [`docs/CAMERA_GUIDE.md#stream-profiles`](docs/CAMERA_GUIDE.md#stream-profiles)). Start from `examples/frigate/config.yml` if you need a template.
+   - Prepare persistent directories (`./media`, `./src/nodered/data`, `./src/grafana/data`) with appropriate permissions if you choose to bind mount instead of named volumes.
 3. **Launch the stack**
    ```bash
-   docker compose up -d
+   docker compose -f src/docker-compose.yml up -d
    scripts/verify_stack.sh
    ```
    The verification script exercises container health and MQTT flows. Extend it per [`docs/OPERATIONS.md#health-checks`](docs/OPERATIONS.md#health-checks).
 4. **Load automations and dashboards**
-   - Import `nodered/flows.json` through the Node-RED editor.
-   - Provision Grafana datasources and dashboards using the scaffolding under [`grafana/provisioning/`](grafana/).
+   - Import `src/nodered/flows.json` through the Node-RED editor.
+   - Provision Grafana datasources and dashboards using the scaffolding under [`src/grafana/provisioning/`](src/grafana/).
    - Capture configuration exports in version control per [`docs/OPERATIONS.md#change-management`](docs/OPERATIONS.md#change-management).
 
 ---

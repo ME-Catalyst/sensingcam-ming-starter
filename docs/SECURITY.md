@@ -12,7 +12,7 @@ This document outlines a defense-in-depth posture for the sensingCam MING starte
 4. **Network isolation** – Place cameras on an isolated VLAN; only Frigate and Node-RED should reach RTSP/HTTPS endpoints.
 5. **Firmware integrity** – Validate SHA-256 checksums for camera firmware and keep the device on the latest signed release.
 6. **Audit trails** – Configure InfluxDB and Grafana to emit audit logs (Docker volumes provided). Ship logs to a SIEM if available.
-7. **Secret management** – Store long-lived tokens in Docker secrets or an external vault. Avoid committing real credentials to version control; use `.env.example` as the template.
+7. **Secret management** – Store long-lived tokens in Docker secrets or an external vault. Avoid committing real credentials to version control; use `src/.env.example` as the template.
 8. **Least privilege** – Generate separate InfluxDB tokens for writes (Node-RED) and reads (Grafana). Mosquitto ACLs should prevent the camera from subscribing to command topics.
 
 ---
@@ -37,7 +37,7 @@ This document outlines a defense-in-depth posture for the sensingCam MING starte
 
 - Subscribe to **SICK PSIRT** advisories for sensingCam firmware announcements.
 - Track CVEs for Mosquitto, Node-RED, InfluxDB, Grafana, and Frigate. Use tools like `trivy` or `grype` against container images.
-- Schedule quarterly reviews to rebuild the stack on the latest base images (`docker compose pull && docker compose up -d`).
+- Schedule quarterly reviews to rebuild the stack on the latest base images (`docker compose -f src/docker-compose.yml pull && docker compose -f src/docker-compose.yml up -d`).
 
 ---
 

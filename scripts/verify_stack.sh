@@ -2,13 +2,14 @@
 set -euo pipefail
 
 COMPOSE=${COMPOSE_CMD:-docker compose}
+COMPOSE_FILE=${COMPOSE_FILE:-src/docker-compose.yml}
 
 if ! command -v mosquitto_pub >/dev/null 2>&1; then
   echo "mosquitto_pub is required to verify the MQTT broker. Install the mosquitto-clients package." >&2
   exit 1
 fi
 
-${COMPOSE} ps
+${COMPOSE} -f "${COMPOSE_FILE}" ps
 
 mosquitto_pub \
   -h "${MOSQUITTO_HOST:-localhost}" \
