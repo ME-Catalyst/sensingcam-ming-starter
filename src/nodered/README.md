@@ -11,7 +11,7 @@ Import the flow using the Node-RED editor menu (`Import > Clipboard`) or by copy
 
 ## Required credentials
 
-Set the following environment variables (see `.env.example`) before deploying:
+Set the following environment variables (see `../.env.example`) before deploying:
 
 - `SICK_CAMERA_HOST`, `SICK_CAMERA_USERNAME`, `SICK_CAMERA_PASSWORD`
 - InfluxDB organization, bucket, and token values

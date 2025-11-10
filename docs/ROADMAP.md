@@ -17,7 +17,7 @@ A suggested progression from proof-of-concept to production. Adjust sequencing a
 
 ## Phase 1 – Proof of Concept
 
-- [x] Scaffold scripts and flows to validate sensingCam connectivity (`scripts/test_camera_api.sh`, `nodered/flows.json`).
+- [x] Scaffold scripts and flows to validate sensingCam connectivity (`scripts/test_camera_api.sh`, `src/nodered/flows.json`).
 - [x] Commit a Docker Compose stack that runs Mosquitto, Node-RED, Frigate, InfluxDB, and Grafana together.
 - [x] Provide Node-RED flows that correlate Frigate clip paths with MQTT event metadata.
 - [ ] Run the stack against a live sensingCam and ingest sample PLC events to confirm end-to-end behaviour.
@@ -37,6 +37,7 @@ A suggested progression from proof-of-concept to production. Adjust sequencing a
 - [ ] Deploy InfluxDB retention policies and downsampling tasks to manage clip metadata growth.
 - [ ] Build Grafana dashboards that juxtapose live HLS playback with anomaly KPIs.
 - [ ] Introduce automated health checks (`scripts/verify_stack.sh` in CI or cron) and alerting for service downtime.
+- [ ] Populate `tests/` with repeatable smoke tests that exercise the compose stack in CI.
 - [ ] Conduct tabletop exercise covering credential rotation and incident response.
 
 **Exit Criteria**
