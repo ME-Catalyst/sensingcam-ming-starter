@@ -18,7 +18,7 @@ Operational guidance for keeping the sensingCam MING stack healthy after day one
 ## Weekly Tasks
 
 1. Export Node-RED flows (`Menu → Export → Selected nodes`) and store in source control.
-2. Run `scripts/verify_stack.sh` to ensure containers respond to health checks.
+2. Run `scripts/verify_stack.sh` to ensure containers respond to health checks (requires `mosquitto_pub` from the `mosquitto-clients` package).
 3. Confirm InfluxDB backups succeed (see [Backups](#backups)).
 4. Review Grafana alerts for noise; tune thresholds if needed.
 
