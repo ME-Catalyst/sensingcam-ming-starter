@@ -111,7 +111,11 @@
     "closePayload": "",
     "willTopic": "",
     "willQos": "0",
-    "willPayload": ""
+    "willPayload": "",
+    "credentials": {
+      "user": "${MOSQUITTO_USERNAME}",
+      "password": "${MOSQUITTO_PASSWORD}"
+    }
   },
   {
     "id": "influxdb-conn",
