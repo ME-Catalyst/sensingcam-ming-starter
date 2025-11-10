@@ -30,6 +30,7 @@ This document outlines a defense-in-depth posture for the sensingCam MING starte
 | Reverse Proxy | Force HTTPS, add HSTS, enable Web Application Firewall (WAF) rules if exposed externally. | SSL Labs scan. |
 | Grafana / Node-RED | Deploy behind the reverse proxy before leaving VLAN_APP; the repository ships without TLS or SSO enabled. | Access attempt outside VLAN should fail. |
 | Logging | Forward Docker logs to centralized store (Loki, ELK). Enable camera syslog if available. | Review aggregator dashboards. |
+| Automation | Keep `make checks` green (linting + compose health) before promotion. | CI logs referencing `tests/run.sh`. |
 
 ---
 

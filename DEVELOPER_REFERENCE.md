@@ -33,7 +33,9 @@ Document configuration changes in the [Changelog](CHANGELOG.md) and tie them to 
 ## Development Workflow
 
 1. Create a feature branch and update relevant configuration or documentation.
-2. Run `scripts/verify_stack.sh` locally or in CI to ensure the stack responds (extend for new services as needed).
+2. Run `make checks` (yamllint + ShellCheck + compose health validation) before opening a pull request.
+   Use `SKIP_COMPOSE_TEST=1 make checks` on systems without Docker to still lint YAML/Bash.
+   Keep `scripts/verify_stack.sh` in sync when adding bespoke manual verification.
 3. Export updated Node-RED flows and Grafana dashboards, committing them with descriptive messages.
 4. Update this reference and the [User Manual](USER_MANUAL.md) when operator-facing behaviours change.
 
@@ -52,10 +54,10 @@ Use conventional commits or similarly structured messages so the [Changelog](CHA
 
 ## Testing & Verification
 
+- **Quality Gate:** `make checks` → `tests/run.sh` executes YAML/Bash linting and compose health validation. See `tests/README.md` for details.
 - **Stack Verification:** `scripts/verify_stack.sh`
 - **Camera API Smoke Test:** `scripts/test_camera_api.sh`
-- **CI Integration:** Wire both scripts into scheduled jobs; record failures and remediation steps in [`docs/OPERATIONS.md#health-checks`](docs/OPERATIONS.md#health-checks).
-- **Future Automation:** Add repeatable checks under `tests/` and surface results in pull request CI.
+- **CI Integration:** Ensure the GitHub Actions workflow runs the same `make checks` gate and capture failures/remediation in [`docs/OPERATIONS.md#health-checks`](docs/OPERATIONS.md#health-checks).
 
 When adding new scripts or services, update this section and append troubleshooting entries to the [Troubleshooting Guide](TROUBLESHOOTING.md).
 

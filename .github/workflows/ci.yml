@@ -6,17 +6,19 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  quality-gate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate shell scripts
+      - name: Install lint dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck
-          find scripts -name '*.sh' -print0 | xargs -0 -n1 shellcheck
-      - name: Validate Node-RED flow
+          sudo apt-get install -y shellcheck yamllint
+      - name: Validate Node-RED flow schema
         run: |
           sudo npm install -g ajv-cli
           ajv validate -s https://raw.githubusercontent.com/node-red/node-red/master/packages/node_modules/%40node-red/flow-library-client/schemas/flow.json \
             -d nodered/flows.json
+      - name: Run repository checks
+        run: |
+          make checks

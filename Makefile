@@ -10,7 +10,7 @@ COMPOSE_FILE ?= src/docker-compose.yml
 # COMPOSE_CMD centralizes the invocation so individual targets remain concise.
 COMPOSE_CMD = $(DOCKER_COMPOSE) -f $(COMPOSE_FILE)
 
-.PHONY: help up down logs verify seed
+.PHONY: help up down logs verify seed lint test checks
 
 help:
 	@echo "Available targets:"
@@ -18,6 +18,9 @@ help:
 	@echo "  make down     - Stop the stack"
 	@echo "  make logs     - Tail logs from all services"
 	@echo "  make verify   - Run scripts/verify_stack.sh"
+	@echo "  make lint     - Run YAML + shell linters"
+	@echo "  make test     - Run compose health checks"
+	@echo "  make checks   - Run linting and compose validation"
 	@echo "  make seed     - Seed InfluxDB with example data"
 
 up:
@@ -37,3 +40,11 @@ verify:
 
 seed:
 	bash scripts/seed_influx_bucket.sh
+
+lint:
+	bash tests/lint.sh
+
+test:
+	bash tests/test_compose_stack.sh
+
+checks: lint test

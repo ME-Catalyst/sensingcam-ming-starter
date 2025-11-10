@@ -15,6 +15,7 @@ Use this guide to diagnose common issues across the sensingCam MING Starter stac
 | REST 401 errors | Authentication | Verify digest auth credentials and clock sync. | [`docs/CAMERA_GUIDE.md#rest-api-tips`](docs/CAMERA_GUIDE.md#rest-api-tips) |
 | Edge host low on disk | Storage planning | Inspect Docker volumes, archive media. | [`docs/ARCHITECTURE.md#volume--storage-layout`](docs/ARCHITECTURE.md#volume--storage-layout) |
 | TLS/SSO misconfiguration | Security hardening | Review reverse proxy configuration. | [`docs/SECURITY.md#hardening-checklist`](docs/SECURITY.md#hardening-checklist) |
+| CI compose validation fails | Automation / Docker | Review `tests/test_compose_stack.sh` output, confirm Docker & compose plugin installed, optionally export `SKIP_COMPOSE_TEST=1`. | [`tests/README.md`](tests/README.md) |
 
 ---
 
@@ -43,6 +44,7 @@ Escalate to the contacts listed in [`docs/OPERATIONS.md#contacts--escalation`](d
 ## Preventive Maintenance
 
 - Schedule health checks using `scripts/verify_stack.sh` and integrate alerts per [`docs/OPERATIONS.md#health-checks`](docs/OPERATIONS.md#health-checks).
+- Run `make checks` locally (or with `SKIP_COMPOSE_TEST=1`) to catch lint/compose issues before pushing changes.
 - Keep firmware and container images updated; reference [`docs/SECURITY.md#patch--vulnerability-management`](docs/SECURITY.md#patch--vulnerability-management).
 - Validate VLAN and QoS policies quarterly against [`docs/NETWORKING.md`](docs/NETWORKING.md) to catch drift.
 
