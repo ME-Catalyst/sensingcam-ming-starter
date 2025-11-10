@@ -4,7 +4,6 @@
 #            the local MING stack is healthy before development or demos.
 # Usage    : [COMPOSE_CMD="docker compose"] [COMPOSE_FILE=src/docker-compose.yml]
 #            ./scripts/verify_stack.sh
-# Ownership: Platform Observability Team (observability@sensingcam.example)
 # =============================================================================
 set -euo pipefail
 
@@ -22,7 +21,7 @@ fi
 
 # Surface container state first so failures later in the script are easier to
 # triage without running docker compose commands manually.
-${COMPOSE} -f "${COMPOSE_FILE}" ps
+"${COMPOSE}" -f "${COMPOSE_FILE}" ps
 
 # Publish an empty retained message to ensure the MQTT broker is reachable.
 mosquitto_pub \
