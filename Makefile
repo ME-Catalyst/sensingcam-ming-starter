@@ -1,3 +1,5 @@
+# The Makefile wraps docker compose commands so contributors do not have to
+# memorize the exact compose flags used by the project.
 SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
@@ -5,6 +7,7 @@ SHELL := /bin/bash
 DOCKER_COMPOSE ?= docker compose
 COMPOSE_FILE ?= src/docker-compose.yml
 
+# COMPOSE_CMD centralizes the invocation so individual targets remain concise.
 COMPOSE_CMD = $(DOCKER_COMPOSE) -f $(COMPOSE_FILE)
 
 .PHONY: help up down logs verify seed
