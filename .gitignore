@@ -2,6 +2,7 @@
 .env.local
 src/.env
 src/.env.local
+src/mosquitto/passwords
 # Media assets are ignored by default. Provide documentation-ready binaries through
 # external storage or per-fork overrides instead of committing them to this repo.
 media/

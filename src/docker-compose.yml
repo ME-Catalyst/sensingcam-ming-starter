@@ -22,7 +22,8 @@ services:
       - "${MOSQUITTO_PORT:-1883}:1883"
     volumes:
       - mosquitto_data:/mosquitto/data
-      - mosquitto_config:/mosquitto/config
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/passwords:/mosquitto/config/passwords:ro
       - mosquitto_log:/mosquitto/log
     environment:
       - TZ=${TZ:-UTC}
@@ -99,6 +100,8 @@ services:
       - "${FRIGATE_WEB_PORT:-8971}:8971"
     environment:
       - FRIGATE_RTSP_PASSWORD=${FRIGATE_RTSP_PASSWORD:?Set FRIGATE_RTSP_PASSWORD in .env}
+      - MOSQUITTO_USERNAME=${MOSQUITTO_USERNAME:?Set MOSQUITTO_USERNAME in .env}
+      - MOSQUITTO_PASSWORD=${MOSQUITTO_PASSWORD:?Set MOSQUITTO_PASSWORD in .env}
     devices:
       - ${FRIGATE_TPU_DEVICE:-/dev/bus/usb}:/dev/bus/usb
     volumes:
@@ -110,7 +113,6 @@ services:
 volumes:
   # Persistent volumes retain state between container recreations.
   mosquitto_data:
-  mosquitto_config:
   mosquitto_log:
   influxdb_data:
   nodered_data:

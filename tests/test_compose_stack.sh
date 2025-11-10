@@ -42,6 +42,13 @@ if [[ ! -d media-test ]]; then
   mkdir -p media-test
   MEDIA_TEST_CREATED=1
 fi
+PASSWORD_FILE="${SRC_DIR}/mosquitto/passwords"
+PASSWORD_FILE_CREATED=0
+if [[ ! -f "${PASSWORD_FILE}" ]]; then
+  PASSWORD_FILE_CREATED=1
+fi
+
+bash "${PROJECT_ROOT}/scripts/generate_mosquitto_passwords.sh"
 
 cleanup() {
   $DOCKER_COMPOSE_BIN -f "$COMPOSE_FILE" down --remove-orphans >/dev/null 2>&1 || true
@@ -50,6 +57,9 @@ cleanup() {
   fi
   if [[ $MEDIA_TEST_CREATED -eq 1 ]]; then
     rm -rf "${SRC_DIR}/media-test"
+  fi
+  if [[ $PASSWORD_FILE_CREATED -eq 1 ]]; then
+    rm -f "${PASSWORD_FILE}"
   fi
 }
 trap cleanup EXIT INT TERM
@@ -106,5 +116,24 @@ while true; do
   fi
   sleep "$POLL_INTERVAL"
 done
+
+if command -v curl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+  FRIGATE_STATS_URL="http://localhost:${FRIGATE_WEB_PORT:-8971}/api/stats"
+  if ! curl --silent --show-error --fail "$FRIGATE_STATS_URL" | python3 <<'PY'
+import json
+import sys
+
+stats = json.load(sys.stdin)
+if stats.get("mqtt", {}).get("connected") is not True:
+    sys.exit(1)
+PY
+  then
+    echo "[FAIL] Frigate API did not report an active MQTT connection." >&2
+    exit 1
+  fi
+  echo "[OK] Frigate API reports MQTT connected."
+else
+  echo "Skipping Frigate MQTT verification due to missing curl or python3." >&2
+fi
 
 popd >/dev/null
