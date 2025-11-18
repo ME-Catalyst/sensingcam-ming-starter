@@ -110,6 +110,64 @@ services:
     depends_on:
       - mosquitto
 
+  # --- Backend API server for React frontend ---
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: sensingcam-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - API_PREFIX=/api
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:5173}
+      - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN:?Set INFLUXDB_TOKEN in .env}
+      - INFLUXDB_ORG=${INFLUXDB_ORG:?Set INFLUXDB_ORG in .env}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET:?Set INFLUXDB_BUCKET in .env}
+      - MQTT_BROKER_URL=mqtt://mosquitto:1883
+      - MQTT_USERNAME=${MOSQUITTO_USERNAME:?Set MOSQUITTO_USERNAME in .env}
+      - MQTT_PASSWORD=${MOSQUITTO_PASSWORD:?Set MOSQUITTO_PASSWORD in .env}
+      - FRIGATE_URL=http://frigate:8971
+      - CAMERA_HOST=${CAMERA_HOST:-192.168.1.50}
+      - CAMERA_USERNAME=${CAMERA_USERNAME:-main}
+      - CAMERA_PASSWORD=${CAMERA_PASSWORD:-servicelevel}
+    depends_on:
+      - mosquitto
+      - influxdb
+      - frigate
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  # --- React frontend served with nginx ---
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: sensingcam-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
 volumes:
   # Persistent volumes retain state between container recreations.
   mosquitto_data:
