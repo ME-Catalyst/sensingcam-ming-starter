@@ -3,3 +3,6 @@ export { Input } from './Input';
 export { Card } from './Card';
 export { Badge } from './Badge';
 export { LoadingSpinner } from './LoadingSpinner';
+export { Select } from './Select';
+export { Modal } from './Modal';
+export { Pagination } from './Pagination';
