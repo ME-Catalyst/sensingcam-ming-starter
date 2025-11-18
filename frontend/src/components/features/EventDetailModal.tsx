@@ -1,5 +1,5 @@
 import { Modal, Badge } from '../ui';
-import { MachineEvent } from '../../types';
+import type { MachineEvent } from '../../types';
 import { formatDate } from '../../utils/formatters';
 import { Calendar, Camera, Activity, Video, Clock } from 'lucide-react';
 

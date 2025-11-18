@@ -1,9 +1,10 @@
+import { type ReactElement } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { ROUTES } from '../constants';
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
+  children: ReactElement;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {

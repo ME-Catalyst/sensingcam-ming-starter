@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Badge, LoadingSpinner } from '../ui';
-import { MachineEvent } from '../../types';
+import type { MachineEvent } from '../../types';
 import { formatDate, formatRelativeTime } from '../../utils/formatters';
 import { ArrowUpDown, Eye, Video } from 'lucide-react';
 
@@ -152,7 +152,7 @@ export const EventsTable = ({ events, isLoading, onEventClick }: EventsTableProp
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     {event.video && (
-                      <Video size={16} className="text-primary-600" title="Has video" />
+                      <Video size={16} className="text-primary-600" />
                     )}
                     {event.thumbnail && (
                       <span className="text-xs text-secondary-500">📸</span>

@@ -1,4 +1,4 @@
-import { MachineEvent } from '../types';
+import type { MachineEvent } from '../types';
 
 export const exportToCSV = (events: MachineEvent[], filename: string = 'events.csv') => {
   if (events.length === 0) {

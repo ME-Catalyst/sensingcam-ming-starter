@@ -5,7 +5,7 @@ import { EventsTable } from '../components/features/EventsTable';
 import { EventDetailModal } from '../components/features/EventDetailModal';
 import { Pagination } from '../components/ui/Pagination';
 import { useEventsStore } from '../store/eventsStore';
-import { MachineEvent } from '../types';
+import type { MachineEvent } from '../types';
 import { exportToCSV } from '../utils/exportCSV';
 import { Download, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
